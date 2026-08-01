@@ -1,8 +1,8 @@
 /* Vercel serverless entry — diagnostic wrapper.
    @vercel/node 5.x calls a function export as (req, res) with a real
    http.IncomingMessage, so an Express app can be invoked directly.
-   This wrapper surfaces any module-load or invocation error in the
-   response body so the exact failure is visible without dashboard access.
+   The first request on each fresh instance awaits the seed (SEED_ON_START)
+   so Vercel does not freeze the instance before seeding completes.
    GET /__diag returns deployment diagnostics (password masked). */
 const mongoose = require('mongoose');
 
@@ -22,13 +22,14 @@ mongoose.connection.on('connected', () => {
   mongoError = null;
 });
 
+let seedPromise = null;
 if (process.env.SEED_ON_START === 'true') {
-  require('../src/seed/seed')
+  seedPromise = require('../src/seed/seed')
     .seedIfEmpty()
     .catch((e) => console.error('[seed] failed:', e.message));
 }
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
   res.setHeader('content-type', 'application/json');
   if (req.url && req.url.startsWith('/__diag')) {
     const uri = process.env.MONGODB_URI || '';
@@ -48,6 +49,10 @@ module.exports = (req, res) => {
         2
       )
     );
+  }
+  if (seedPromise) {
+    await seedPromise;
+    seedPromise = null;
   }
   if (!app) {
     res.statusCode = 500;
