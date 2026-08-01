@@ -54,8 +54,18 @@ app.use(
 app.use(
   cors({
     origin: (origin, cb) => {
-      const allowed = [process.env.CLIENT_URL || 'http://localhost:5173'];
-      if (!origin || allowed.includes(origin)) return cb(null, true);
+      const normalize = (value) => {
+        try {
+          return new URL(value).origin;
+        } catch {
+          return String(value).replace(/\/+$/, '');
+        }
+      };
+      const allowed = (process.env.CLIENT_URL || 'http://localhost:5173')
+        .split(',')
+        .map(normalize)
+        .filter(Boolean);
+      if (!origin || allowed.includes(normalize(origin))) return cb(null, true);
       return cb(new Error('Not allowed by CORS'));
     },
     credentials: true,
