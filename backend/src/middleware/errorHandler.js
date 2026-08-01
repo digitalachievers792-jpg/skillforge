@@ -35,8 +35,7 @@ const errorHandler = (err, req, res, next) => {
 
   if (!error.isOperational) {
     console.error('[SkillForge] Unhandled error:', err);
-    // Temporary: surface the real error while live-debugging the deployment.
-    error = new ApiError(500, `Internal server error. (${err.message})`);
+    error = new ApiError(500, 'Internal server error.');
   }
 
   const status = error.status || 500;
