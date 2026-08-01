@@ -2,6 +2,15 @@
 
 A full-stack Final Year Project: an LMS + job marketplace + community forum + AI mentor, built with the **MERN stack** (React, Express, MongoDB) plus a modern 3D/light UI.
 
+## 🌐 Live Deployment
+
+| Part | URL |
+|---|---|
+| **Frontend** (GitHub Pages) | https://digitalachievers792-jpg.github.io/skillforge/ |
+| **Backend API** (Vercel) | https://skillforge-kappa-ten.vercel.app/ |
+| API health check | https://skillforge-kappa-ten.vercel.app/api/health |
+| API diagnostics | https://skillforge-kappa-ten.vercel.app/__diag |
+
 > **Demo credentials** (created by the seed script, password for all: `Password@123`)
 >
 > | Role | Email |
