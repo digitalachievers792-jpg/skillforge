@@ -3,7 +3,7 @@ const Course = require('../models/Course');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { sanitizePlainText } = require('../utils/sanitize');
-const { saveUploadedFile, deleteUploadedFile } = require('../middleware/upload');
+const { saveFile, deleteFile } = require('../utils/gridfs');
 
 exports.getMe = asyncHandler(async (req, res) => {
   const user = await User.findById(req.userId).populate('savedJobs', 'title company locationCity mode type');
@@ -40,8 +40,8 @@ exports.uploadAvatar = asyncHandler(async (req, res) => {
   if (!req.file) throw new ApiError(400, 'Please choose an image file.');
 
   const user = await User.findById(req.userId);
-  const newPath = saveUploadedFile(req.file, 'avatars');
-  if (user.avatar && user.avatar.startsWith('/uploads/')) deleteUploadedFile(user.avatar);
+  const newPath = await saveFile(req.file);
+  if (user.avatar && user.avatar.startsWith('/api/uploads/')) await deleteFile(user.avatar);
   user.avatar = newPath;
   await user.save();
 
@@ -52,9 +52,9 @@ exports.uploadResume = asyncHandler(async (req, res) => {
   if (!req.file) throw new ApiError(400, 'Please choose a PDF or DOCX file.');
 
   const user = await User.findById(req.userId);
-  const newPath = saveUploadedFile(req.file, 'resumes');
-  if (user.resume && user.resume.path && user.resume.path.startsWith('/uploads/')) {
-    deleteUploadedFile(user.resume.path);
+  const newPath = await saveFile(req.file);
+  if (user.resume && user.resume.path && user.resume.path.startsWith('/api/uploads/')) {
+    await deleteFile(user.resume.path);
   }
   user.resume = { path: newPath, name: req.file.originalname.slice(0, 120), uploadedAt: new Date() };
   await user.save();
@@ -64,7 +64,7 @@ exports.uploadResume = asyncHandler(async (req, res) => {
 
 exports.removeResume = asyncHandler(async (req, res) => {
   const user = await User.findById(req.userId);
-  if (user.resume && user.resume.path) deleteUploadedFile(user.resume.path);
+  if (user.resume && user.resume.path) await deleteFile(user.resume.path);
   user.resume = { path: '', name: '', uploadedAt: undefined };
   await user.save();
   res.json({ success: true, message: 'Resume removed.', user });

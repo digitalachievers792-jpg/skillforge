@@ -9,6 +9,7 @@ const morgan = require('morgan');
 
 const { csrfProtection } = require('./middleware/csrf');
 const { apiLimiter } = require('./middleware/rateLimiters');
+const { streamFile } = require('./utils/gridfs');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/auth');
@@ -74,6 +75,10 @@ app.use('/api', apiLimiter);
 app.use(csrfProtection);
 
 app.get('/api/health', (req, res) => res.json({ success: true, message: 'SkillForge API is healthy', time: new Date().toISOString() }));
+app.get('/api/uploads/:id', async (req, res) => {
+  const ok = await streamFile(res, req.params.id);
+  if (!ok) return res.status(404).json({ success: false, message: 'File not found.' });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

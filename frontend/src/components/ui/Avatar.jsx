@@ -1,4 +1,5 @@
 import { cn, initials } from '../../utils/format';
+import { apiUrl } from '../../utils/apiUrl';
 
 const colors = [
   'bg-indigo-100 text-indigo-700',
@@ -35,7 +36,7 @@ const Avatar = ({ name = '', src = '', size = 'md', className, ring = false }) =
       )}
     >
       {src ? (
-        <img src={src} alt={name} className="h-full w-full object-cover" loading="lazy" />
+        <img src={apiUrl(src)} alt={name} className="h-full w-full object-cover" loading="lazy" />
       ) : (
         <span>{initials(name)}</span>
       )}

@@ -4,7 +4,7 @@ const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { paginate } = require('../utils/helpers');
 const { sanitizePlainText } = require('../utils/sanitize');
-const { saveUploadedFile } = require('../middleware/upload');
+const { saveFile } = require('../utils/gridfs');
 const { createNotification } = require('../utils/notifications');
 const User = require('../models/User');
 
@@ -20,7 +20,7 @@ exports.apply = asyncHandler(async (req, res) => {
   let resumeName = '';
 
   if (req.file) {
-    resumePath = saveUploadedFile(req.file, 'resumes');
+    resumePath = await saveFile(req.file);
     resumeName = req.file.originalname.slice(0, 120);
   } else if (user.resume && user.resume.path) {
     resumePath = user.resume.path;

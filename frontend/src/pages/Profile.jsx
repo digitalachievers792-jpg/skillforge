@@ -11,6 +11,7 @@ import Badge from '../components/ui/Badge';
 import { Input, Textarea } from '../components/ui/Field';
 import { ROLE_LABELS } from '../utils/constants';
 import { cn, formatDate } from '../utils/format';
+import { apiUrl } from '../utils/apiUrl';
 
 const Profile = () => {
   const { user, refreshUser } = useAuth();
@@ -195,7 +196,7 @@ const Profile = () => {
             </div>
             {user?.resume?.path && (
               <a
-                href={user.resume.path}
+                href={apiUrl(user.resume.path)}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-soft flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold"

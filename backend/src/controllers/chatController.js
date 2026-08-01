@@ -34,7 +34,7 @@ const callOpenAI = async ({ messages, courseCatalog, user }) => {
   };
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 20000);
+  const timer = setTimeout(() => controller.abort(), 8000);
 
   try {
     const response = await fetch(`${baseUrl}/chat/completions`, {
@@ -153,7 +153,11 @@ exports.sendMessage = asyncHandler(async (req, res) => {
 
   let reply;
   if (process.env.OPENAI_API_KEY) {
-    reply = await callOpenAI({ messages: [...conversation, { role: 'user', content }], courseCatalog, user: req.user });
+    try {
+      reply = await callOpenAI({ messages: [...conversation, { role: 'user', content }], courseCatalog, user: req.user });
+    } catch {
+      reply = await mockMentor({ message: content, courseCatalog, user: req.user });
+    }
   } else {
     reply = await mockMentor({ message: content, courseCatalog, user: req.user });
   }
