@@ -3,6 +3,8 @@ const ApiError = require('../utils/ApiError');
 
 const CSRF_COOKIE = 'csrfToken';
 const isProd = process.env.NODE_ENV === 'production';
+// Cross-site deployments (frontend and API on different domains) need SameSite=None.
+const sameSite = process.env.COOKIE_SAMESITE === 'none' ? 'none' : 'lax';
 const UNSAFE_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
 
 const csrfProtection = (req, res, next) => {
@@ -11,7 +13,7 @@ const csrfProtection = (req, res, next) => {
     token = crypto.randomBytes(32).toString('hex');
     res.cookie(CSRF_COOKIE, token, {
       httpOnly: false,
-      sameSite: 'lax',
+      sameSite,
       secure: isProd,
       path: '/',
     });
