@@ -1,0 +1,44 @@
+# SkillForge — Render blueprint (single-origin deployment)
+# The backend serves the built frontend (frontend/dist) at the same origin,
+# so cookies (SameSite=Lax), CSRF, uploads and the relative /api proxy all work as-is.
+#
+# Before deploying:
+#   1. Create a MongoDB Atlas cluster and copy the connection string.
+#   2. Generate two long random secrets for JWT_ACCESS_SECRET / JWT_REFRESH_SECRET.
+#   3. Optional: set OPENAI_API_KEY to enable the real AI mentor.
+#
+# Frontend must be built before start: buildCommand runs npm ci + vite build.
+services:
+  - type: web
+    name: skillforge
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm --prefix backend ci && npm --prefix frontend ci && npm --prefix frontend run build
+    startCommand: npm --prefix backend start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false # paste your Atlas connection string in the Render dashboard
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRES_IN
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 7d
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SEED_ADMIN_EMAIL
+        value: admin@skillforge.dev
+      - key: SEED_ADMIN_PASSWORD
+        sync: false

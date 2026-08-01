@@ -159,3 +159,31 @@ Emails (verification / password reset) are **not actually sent** in development.
 - Helmet headers, rate limiting on auth & uploads, input sanitization (server + client)
 - Semantic HTML, alt texts, ARIA labels, keyboard-accessible controls
 - Lazy-loaded chunks (three.js, recharts, framer-motion split from app code)
+
+## ☁️ Deployment
+
+### Option A — Single-origin on Render (recommended, simplest)
+
+The backend serves the built frontend from the same domain, so cookies (SameSite=Lax), CSRF, uploads, and the relative `/api` calls keep working with **zero extra config**.
+
+1. Push this repo to GitHub.
+2. Create a free **MongoDB Atlas** cluster, copy the connection string.
+3. On Render → New → Blueprint → pick the repo → it reads `render.yaml`:
+   - Set `MONGODB_URI` (Atlas string)
+   - Set `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` (long random strings)
+   - Optional: `SMTP_HOST`/`SMTP_USER`/`SMTP_PASS` for real emails, `OPENAI_API_KEY` for the real AI mentor
+4. Deploy. App URL will be `https://skillforge.onrender.com` (health check: `/api/health`).
+
+> Email is in demo mode by default — verification/reset links are logged in the console and written to `/backend/emails`.
+
+### Option B — Frontend on Vercel + backend on Render (separate domains)
+
+1. Deploy the backend (Node) on Render — set `NODE_ENV=production`, `MONGODB_URI`, JWT secrets, and `CLIENT_URL=https://your-frontend.vercel.app`.
+2. Because cookies cross domains, set `COOKIE_SAMESITE=none` on the backend (requires HTTPS, which both platforms provide).
+3. Deploy the frontend folder (`frontend/`) to Vercel with `vercel.json` (SPA rewrites included). Set build env:
+   - `VITE_API_BASE_URL=https://your-backend.onrender.com`
+4. Optional: `OPENAI_API_KEY` on the backend to enable the real AI mentor (offline rule-based mentor is used when empty).
+
+### OpenAI (AI mentor)
+
+No code changes needed — `chatController` auto-switches when `OPENAI_API_KEY` is set. Any OpenAI-compatible endpoint works (`OPENAI_BASE_URL`, `OPENAI_MODEL`, default `gpt-4o-mini`). Without a key, the built-in offline mentor answers course/career questions.

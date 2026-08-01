@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -89,6 +90,19 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/instructor', instructorRoutes);
 
 app.get('/', (req, res) => res.json({ success: true, name: 'SkillForge API', docs: '/api/health' }));
+
+// Production single-origin deployment: serve the built frontend (../frontend/dist)
+// and fall back to index.html for client-side routes.
+const distDir = path.join(__dirname, '..', '..', 'frontend', 'dist');
+if (isProd && fs.existsSync(distDir)) {
+  app.use(express.static(distDir));
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+      return res.sendFile(path.join(distDir, 'index.html'));
+    }
+    next();
+  });
+}
 
 app.use(notFound);
 app.use(errorHandler);
