@@ -552,7 +552,7 @@ async function seed({ skipDisconnect = false } = {}) {
   console.log(`Courses:     ${courses.length}  Jobs: ${jobs.length}  Posts: ${posts.length}  Enrollments: ${enrollments.length}`);
   console.log('====================================');
 
-  await mongoose.disconnect();
+  if (!skipDisconnect) await mongoose.disconnect();
   if (require.main === module) process.exit(0);
   return { courses: courses.length, jobs: jobs.length, posts: posts.length, enrollments: enrollments.length };
 }
