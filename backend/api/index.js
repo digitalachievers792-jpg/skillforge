@@ -23,15 +23,18 @@ mongoose.connection.on('connected', () => {
 });
 
 let seedPromise = null;
+let seedError = null;
 if (process.env.SEED_ON_START === 'true') {
   seedPromise = require('../src/seed/seed')
     .seedIfEmpty()
-    .catch((e) => console.error('[seed] failed:', e.message));
+    .catch((e) => {
+      seedError = (e && e.stack) || String(e);
+      console.error('[seed] failed:', e.message);
+    });
 }
 
 module.exports = async (req, res) => {
-  res.setHeader('content-type', 'application/json');
-  if (req.url && req.url.startsWith('/__diag')) {
+  res.setHeader('content-type', 'application/json');  if (req.url && req.url.startsWith('/__diag')) {
     const uri = process.env.MONGODB_URI || '';
     const masked = uri.replace(/\/\/[^@/]+@/, '//***:***@');
     return res.end(
@@ -44,6 +47,7 @@ module.exports = async (req, res) => {
           mongoError,
           seedOnStart: process.env.SEED_ON_START === 'true',
           clientUrl: process.env.CLIENT_URL || null,
+          seedError,
         },
         null,
         2
@@ -73,3 +77,5 @@ module.exports = async (req, res) => {
     );
   }
 };
+
+module.exports.config = { maxDuration: 60 };
