@@ -311,7 +311,7 @@ async function wipeAll() {
   console.log('[seed] Cleared all collections.');
 }
 
-async function seed() {
+async function seed({ skipDisconnect = false } = {}) {
   await connectDB();
   if (WIPE) await wipeAll();
 
@@ -553,10 +553,26 @@ async function seed() {
   console.log('====================================');
 
   await mongoose.disconnect();
-  process.exit(0);
+  if (require.main === module) process.exit(0);
+  return { courses: courses.length, jobs: jobs.length, posts: posts.length, enrollments: enrollments.length };
 }
 
-seed().catch((err) => {
-  console.error('[seed] Failed:', err.message);
-  process.exit(1);
-});
+const seedIfEmpty = async () => {
+  await connectDB();
+  const count = await User.countDocuments();
+  if (count > 0) {
+    console.log(`[seed] Database already has ${count} users — skipping seed.`);
+    return null;
+  }
+  console.log('[seed] Empty database detected — seeding demo data...');
+  return seed({ skipDisconnect: true });
+};
+
+if (require.main === module) {
+  seed().catch((err) => {
+    console.error('[seed] Failed:', err.message);
+    process.exit(1);
+  });
+} else {
+  module.exports = { seedIfEmpty };
+}
