@@ -35,13 +35,14 @@ const errorHandler = (err, req, res, next) => {
 
   if (!error.isOperational) {
     console.error('[SkillForge] Unhandled error:', err);
-    error = new ApiError(500, 'Internal server error.');
+    // Temporary: surface the real error while live-debugging the deployment.
+    error = new ApiError(500, `Internal server error. (${err.message})`);
   }
 
   const status = error.status || 500;
   const payload = { success: false, message: error.message };
   if (error.details) payload.details = error.details;
-  if (status >= 500 && process.env.NODE_ENV !== 'production') payload.stack = error.stack;
+  if (status >= 500 && (process.env.NODE_ENV !== 'production' || process.env.DEBUG_ERRORS === 'true')) payload.stack = error.stack;
 
   res.status(status).json(payload);
 };
