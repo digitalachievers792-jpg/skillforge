@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { getCsrfToken } from '../utils/csrf';
 
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/+$/, '');
+
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: API_BASE.endsWith('/api') ? API_BASE : `${API_BASE}/api`,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
