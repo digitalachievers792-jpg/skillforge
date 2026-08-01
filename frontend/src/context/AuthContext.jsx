@@ -59,8 +59,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const onExpired = () => {
       persist(null);
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login?session=expired';
+      if (!window.location.pathname.endsWith('/login')) {
+        window.location.href = `${import.meta.env.BASE_URL}login?session=expired`;
       }
     };
     window.addEventListener('skillforge:session-expired', onExpired);
