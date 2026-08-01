@@ -9,12 +9,15 @@ import Button from '../ui/Button';
 const FeaturedCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     api
       .get('/courses/featured')
       .then((d) => setCourses(d.courses || []))
-      .catch(() => {})
+      .catch((e) => {
+        setLoadError(`${e.message}${e.response?.status ? ` (HTTP ${e.response.status})` : ''}${e.config?.url ? ` — ${e.config.baseURL || ''}${e.config.url}` : ''}`);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -38,6 +41,12 @@ const FeaturedCourses = () => {
           View all courses <FiArrowRight className="h-4 w-4" />
         </Button>
       </motion.div>
+
+      {loadError && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
+          Load error: {loadError}
+        </div>
+      )}
 
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

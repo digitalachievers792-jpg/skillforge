@@ -25,19 +25,32 @@ const Courses = () => {
   const [data, setData] = useState({ courses: [], total: 0, pages: 1 });
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const debouncedQuery = useDebounce(query, 350);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setLoadError('');
     const clean = { ...filters, q: debouncedQuery };
     Object.keys(clean).forEach((k) => {
       if (!clean[k] && k !== 'page') delete clean[k];
     });
     api
       .get('/courses', clean)
-      .then((d) => !cancelled && setData(d))
-      .catch(() => {})
+      .then((d) => {
+        if (cancelled) return;
+        if (!Array.isArray(d.courses)) {
+          setLoadError(`Unexpected API response: ${JSON.stringify(d).slice(0, 300)}`);
+          setData({ courses: [], total: 0, pages: 1 });
+          return;
+        }
+        setData(d);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setLoadError(`${e.message}${e.response?.status ? ` (HTTP ${e.response.status})` : ''}${e.config?.url ? ` — ${e.config.baseURL || ''}${e.config.url}` : ''}`);
+      })
       .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
@@ -104,6 +117,12 @@ const Courses = () => {
               </span>
             ))}
           </div>
+
+          {loadError && (
+            <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
+              Load error: {loadError}
+            </div>
+          )}
 
           {loading ? (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
