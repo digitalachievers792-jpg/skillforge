@@ -180,7 +180,7 @@ The backend serves the built frontend from the same domain, so cookies (SameSite
 
 1. Deploy the backend (Node) on Render — set `NODE_ENV=production`, `MONGODB_URI`, JWT secrets, and `CLIENT_URL=https://your-frontend.vercel.app`.
 2. Because cookies cross domains, set `COOKIE_SAMESITE=none` on the backend (requires HTTPS, which both platforms provide).
-3. Deploy the frontend folder (`frontend/`) to Vercel with `vercel.json` (SPA rewrites included). Set build env:
+3. Deploy the frontend folder (`frontend/`) to **Vercel** (with `vercel.json`, SPA rewrites included) or **Netlify** (with `netlify.toml`, already set up). Set build env:
    - `VITE_API_BASE_URL=https://your-backend.onrender.com`
 4. Optional: `OPENAI_API_KEY` on the backend to enable the real AI mentor (offline rule-based mentor is used when empty).
 
