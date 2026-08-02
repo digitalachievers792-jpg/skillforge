@@ -34,7 +34,8 @@ if (process.env.SEED_ON_START === 'true') {
 }
 
 module.exports = async (req, res) => {
-  res.setHeader('content-type', 'application/json');  if (req.url && req.url.startsWith('/__diag')) {
+  if (req.url && req.url.startsWith('/__diag')) {
+    res.setHeader('content-type', 'application/json');
     const uri = process.env.MONGODB_URI || '';
     const masked = uri.replace(/\/\/[^@/]+@/, '//***:***@');
     return res.end(
@@ -59,6 +60,7 @@ module.exports = async (req, res) => {
     seedPromise = null;
   }
   if (!app) {
+    res.setHeader('content-type', 'application/json');
     res.statusCode = 500;
     return res.end(
       JSON.stringify({ success: false, error: 'MODULE LOAD FAILED', detail: loadError })
@@ -67,6 +69,7 @@ module.exports = async (req, res) => {
   try {
     app(req, res);
   } catch (e) {
+    res.setHeader('content-type', 'application/json');
     res.statusCode = 500;
     res.end(
       JSON.stringify({
