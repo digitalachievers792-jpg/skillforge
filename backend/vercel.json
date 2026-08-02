@@ -1,4 +1,11 @@
 {
-  "builds": [{ "src": "api/index.js", "use": "@vercel/node" }],
-  "routes": [{ "src": "/(.*)", "dest": "api/index.js" }]
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node",
+      "includeFiles": "frontend/dist/**"
+    }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "api/index.js" }],
+  "buildCommand": "node scripts/build-static.mjs"
 }

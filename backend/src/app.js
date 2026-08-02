@@ -51,7 +51,7 @@ app.use(
   })
 );
 
-app.use(
+app.use((req, res, next) => {
   cors({
     origin: (origin, cb) => {
       const normalize = (value) => {
@@ -65,12 +65,14 @@ app.use(
         .split(',')
         .map(normalize)
         .filter(Boolean);
-      if (!origin || allowed.includes(normalize(origin))) return cb(null, true);
+      const sameOrigin =
+        origin && normalize(origin) === normalize(`${req.protocol}://${req.get('host')}`);
+      if (!origin || sameOrigin || allowed.includes(normalize(origin))) return cb(null, true);
       return cb(new Error('Not allowed by CORS'));
     },
     credentials: true,
-  })
-);
+  })(req, res, next);
+});
 
 app.use(compression());
 app.use(express.json({ limit: '1mb' }));
@@ -104,7 +106,9 @@ app.use('/api/search', searchRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/instructor', instructorRoutes);
 
-app.get('/', (req, res) => res.json({ success: true, name: 'SkillForge API', docs: '/api/health' }));
+if (!(isProd && fs.existsSync(path.join(__dirname, '..', '..', 'frontend', 'dist')))) {
+  app.get('/', (req, res) => res.json({ success: true, name: 'SkillForge API', docs: '/api/health' }));
+}
 
 // Production single-origin deployment: serve the built frontend (../frontend/dist)
 // and fall back to index.html for client-side routes.
