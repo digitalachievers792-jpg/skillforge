@@ -1,11 +1,12 @@
 import { execSync } from 'node:child_process';
 import { cpSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 
 const backend = fileURLToPath(new URL('..', import.meta.url));
 const repo = fileURLToPath(new URL('../..', import.meta.url));
 const frontend = `${repo}frontend`;
-const dest = `${backend}public`;
+const dest = path.join(process.cwd(), 'public');
 
 console.log('[build-static] frontend dir:', frontend);
 console.log('[build-static] installing frontend deps...');
