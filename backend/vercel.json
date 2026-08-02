@@ -1,4 +1,9 @@
 {
-  "routes": [{ "src": "/(.*)", "dest": "api/index.js" }],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "/__diag", "dest": "/api/index.js" },
+    { "src": "/(.*)\\.(js|css|map|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot|json|txt)$", "dest": "/public/$1.$2" },
+    { "src": "/(.*)", "dest": "/public/index.html" }
+  ],
   "buildCommand": "node scripts/build-static.mjs"
 }
