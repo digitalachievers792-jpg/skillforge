@@ -122,7 +122,7 @@ npm run seed:wipe     # clears + recreates demo users, courses, jobs, forum, enr
 npm run dev           # backend :5000 + frontend :5173 (concurrently)
 ```
 
-- Frontend: **http://localhost:5173**
+- Frontend: **https://skillforge-git-main-hiii14.vercel.app/**
 - Backend: **http://localhost:5000/api/health**
 - Production: `npm run build` then `npm start`
 
