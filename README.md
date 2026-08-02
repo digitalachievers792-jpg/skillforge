@@ -6,10 +6,12 @@ A full-stack Final Year Project: an LMS + job marketplace + community forum + AI
 
 | Part | URL |
 |---|---|
-| **Frontend** (GitHub Pages) | https://digitalachievers792-jpg.github.io/skillforge/ |
-| **Backend API** (Vercel) | https://skillforge-kappa-ten.vercel.app/ |
+| **Site + API (single origin)** | https://skillforge-kappa-ten.vercel.app/ |
 | API health check | https://skillforge-kappa-ten.vercel.app/api/health |
 | API diagnostics | https://skillforge-kappa-ten.vercel.app/__diag |
+| Mirror (GitHub Pages, browse-only) | https://digitalachievers792-jpg.github.io/skillforge/ |
+
+> The main site is served by Vercel (frontend + API on one domain), so cookies, CSRF and uploads work in every browser. The GitHub Pages mirror renders public content, but login needs third-party cookies — use the Vercel URL for full functionality.
 
 > **Demo credentials** (created by the seed script, password for all: `Password@123`)
 >
