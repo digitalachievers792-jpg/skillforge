@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.js" },
-    { "source": "/__diag", "destination": "/api/index.js" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
-  "buildCommand": "node -e \"const fs=require('fs');const p=fs.existsSync('backend/scripts/build-static.mjs')?'backend/scripts/build-static.mjs':'scripts/build-static.mjs';require('child_process').execSync('node '+p,{stdio:'inherit'})\""
-}
